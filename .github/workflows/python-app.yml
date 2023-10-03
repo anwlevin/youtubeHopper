@@ -1,6 +1,7 @@
 name: Youtube Hopper
 run-name: Youtube Hopper (${{ github.actor }})🚀
 on:
+  push:
   schedule:
     - cron: '*/10 * * * *'
 permissions:
