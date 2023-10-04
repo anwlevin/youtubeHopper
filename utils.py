@@ -37,7 +37,7 @@ def write_file(path, data, mode='w+'):
         print('Err.', 'write_file: try: with open()')
         return
 
-    return path.as_posix()
+    return path
 
 
 def getFirstYoutubeUrl(text):

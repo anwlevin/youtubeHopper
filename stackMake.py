@@ -25,20 +25,23 @@ def author_clip_init(author_url) -> pathlib.Path | None | bool:
 
 
 def thumbnail_clip(thumbnail_url, author_dir, clip_slug) -> pathlib.Path | None:
+    #print('🖼 thumbnail_clip')
     if not thumbnail_url:
+        print('🛑️ Err \t not thumbnail_url:')
         return
 
     thumbnail_url = thumbnail_url.split('?')[0]
 
     exts = thumbnail_url.split('.')
     if len(exts) < 2:
+        print('🛑️ Err \t len(exts) < 2:')
         return
     ext = exts[-1]
 
     r = requests.get(thumbnail_url, allow_redirects=True, stream=True)
 
     thumbnail_file = author_dir.joinpath(f'{clip_slug}-thumbnail.{ext}')
-    write_file(thumbnail_file, r.content, mode='wb+')
+    return write_file(thumbnail_file, r.content, mode='wb+')
 
 
 def process_one_clip(clip_id):
@@ -77,7 +80,7 @@ def process_one_clip(clip_id):
     clip_slug = f'video-{clip_id}'
 
     if thumbnail_path := thumbnail_clip(context['thumbnail_url'], author_dir, clip_slug):
-        context['thumbnail'] = thumbnail_path
+        context['thumbnail'] = thumbnail_path.name
 
     video_text = yaml.dump(
         context,
