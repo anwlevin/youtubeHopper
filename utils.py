@@ -1,3 +1,4 @@
+import os
 import pathlib
 
 def read_file(path: str | pathlib.Path):
@@ -24,6 +25,18 @@ def write_file(path: str | pathlib.Path, data) -> pathlib.Path | None:
     return path
 
 
+def write_file(path, data, mode='w+'):
+    path = pathlib.Path(path)
+    try:
+        with open(path.resolve().as_posix(), mode) as f:
+            f.write(data)
+    except (Exception,):
+        print('Err.', 'write_file: try: with open()')
+        return
+
+    return path.as_posix()
+
+
 def getFirstYoutubeUrl(text):
     extractor = URLExtract()
     urls = extractor.find_urls(text)
@@ -34,3 +47,15 @@ def getFirstYoutubeUrl(text):
             return url
 
     return None
+
+
+def walk_files(path: str | pathlib.Path) -> list[pathlib.Path]:
+    path = pathlib.Path(path)
+    data = []
+    for root, dirs, files in os.walk(path.as_posix(), topdown=False):
+        for name in files:
+            file_path = os.path.join(root, name)
+            data.append(file_path)
+
+    all_files = [pathlib.Path(file) for file in data]
+    return all_files
