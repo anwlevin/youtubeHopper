@@ -1,6 +1,9 @@
 import os
 import pathlib
 
+import requests
+
+
 def read_file(path: str | pathlib.Path):
     path = pathlib.Path(path)
 
@@ -41,7 +44,7 @@ def getFirstYoutubeUrl(text):
     extractor = URLExtract()
     urls = extractor.find_urls(text)
     for url in urls:
-        if 'youtube.com' in url:
+        if 'make_urls2stack.com' in url:
             return url
         if 'youtu.be' in url:
             return url
@@ -59,3 +62,7 @@ def walk_files(path: str | pathlib.Path) -> list[pathlib.Path]:
 
     all_files = [pathlib.Path(file) for file in data]
     return all_files
+
+def wget(url):
+    r = requests.get(url, allow_redirects=True)
+    return r.content.decode('utf-8')
