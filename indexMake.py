@@ -86,21 +86,13 @@ def renderForwardPostContent(message: telegram.Message, data: dict):
          })
 
 
-def makeIndexOneChat(chat):
-    print('🧿 makeIndexOneChat(): ', chat.name)
+def makeIndexOneAuthor(author_dir):
+    print('🧿 makeIndexOneAuthor(): ', author_dir.name)
 
-    #chat_about = chat.joinpath('about.yml')
-    #chat_about_text = read_file(chat_about)
-    #chat_about_yml = yaml.load(chat_about_text, Loader=yaml.Loader)
-    #chat_title = chat_about_yml.get('title')
-    #chat_title_small = chat_about_yml.get('title_small')
-    #chat_id = chat_about_yml.get('id')
-    #index_title = f'{chat_title} (chat: {chat_id})'
-
-
-    clips = sorted(list(filter(lambda file: file.name.startswith('video-') and file.name.endswith('.yml'), chat.iterdir())), reverse=True)
+    clips = sorted(list(filter(lambda file: file.name.startswith('video-') and file.name.endswith('.yml'), author_dir.iterdir())), reverse=True)
 
     clips_context = []
+
     for clip in clips:
         print('📮 Clip: ', clip.name)
 
@@ -113,30 +105,34 @@ def makeIndexOneChat(chat):
 
         clip_context['title'] = data_clip['title']
         clip_context['date'] = data_clip['publish_date']
+        clip_context['url'] = data_clip['url']
 
-        text_html = data_clip['url']
         clip_url = data_clip['url']
         clip_description = data_clip['description']
-        clip_context['text'] = f'''
+        clip_context['description'] = f'''
         <p>
-            <a href="{clip_url}">{clip_url}</a>
-        </p>
-        <p>{clip_description}</p>
+            {data_clip['publish_date']}
+            </p>
+        <p>
+            {clip_description}
+            </p>
         '''
 
-        clip_context['photo'] = data_clip['thumbnail']
+        clip_context['thumbnail'] = data_clip['thumbnail']
 
         clips_context.append(clip_context)
 
-    template = Environment(loader=FileSystemLoader("templates")).get_template("index-chat-posts.html")
-    write_file(chat.joinpath('index.html'), template.render({
-        'title': f'{chat.name} | Index',
-        'posts': clips_context,
-        'chat': {
-            'title': chat.name,
-            'title_small': chat.name,
-            'id': chat.name
-        }
+    clips_context.sort(key=lambda clip_one: clip_one['date'], reverse=True)
+
+    author_text = read_file(author_dir.joinpath('about.yml'))
+    author_data = yaml.load(author_text, Loader=yaml.Loader)
+    author_data['username'] = author_dir.name
+
+    template = Environment(loader=FileSystemLoader("templates")).get_template("grid-cards-clips.html")
+    write_file(author_dir.joinpath('index.html'), template.render({
+        'title': f'{author_dir.name} | Index',
+        'author': author_data,
+        'clips': clips_context,
     }))
 
 
@@ -144,36 +140,32 @@ def makeIndexOneChat(chat):
 def makeIndexAllChats():
     print('💎️ makeIndexAllChats(): ')
 
-    if not config.STORE_CLIPS.exists():
-        print('🚫 not config.STORE_CLIPS.exists():')
+    if not config.AUTHORS_DIR.exists():
+        print('🚫 not config.AUTHORS_DIR.exists:')
         return
 
-    chat_dirs = sorted(list(filter(lambda file: file.is_dir(), config.STORE_CLIPS.iterdir())), reverse=True)
-    for chat in chat_dirs:
-        makeIndexOneChat(chat)
+    author_dirs = sorted(list(filter(lambda file: file.is_dir(), config.AUTHORS_DIR.iterdir())), reverse=True)
+    for author_dir in author_dirs:
+        makeIndexOneAuthor(author_dir)
 
     print()
     print('💎️ make All Index (): ')
-    chats_context = []
-    for chat in chat_dirs:
-        #chat_about = chat.joinpath('about.yml')
-        #chat_about_text = read_file(chat_about)
-        #chat_about_yml = yaml.load(chat_about_text, Loader=yaml.Loader)
-        #chat_title = chat_about_yml.get('title')
-        #chat_title_small = chat_about_yml.get('title_small')
-        #chat_id = chat_about_yml.get('id')
+    authors_context = []
 
-        chats_context.append({
-            'href': chat.name,
-            'title': chat.name,
-            'title_small': chat.name,
-            'id': chat.name,
-        })
+    for author_dir in author_dirs:
+        author_text = read_file(author_dir.joinpath('about.yml'))
+        author_data = yaml.load(author_text, Loader=yaml.Loader)
+        author_data['username'] = author_dir.name
+        author_data['thumbnail'] = author_dir.name + '/' + author_data['thumbnail']
+        author_data['href'] = author_dir.name
+        authors_context.append(author_data)
 
-    template = Environment(loader=FileSystemLoader("templates")).get_template("index-store-chats.html")
-    write_file(config.STORE_CLIPS.joinpath('index.html'), template.render({
+    authors_context.sort(key=lambda author: author['title'])
+
+    template = Environment(loader=FileSystemLoader("templates")).get_template("index-authors-all.html")
+    write_file(config.AUTHORS_DIR.joinpath('index.html'), template.render({
         'title': f'Index of the Store',
-        'chats': chats_context}))
+        'authors': authors_context}))
 
 
 

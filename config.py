@@ -18,7 +18,7 @@ DISCOVER_LAST_POST_TXT = pathlib.Path('last.txt')
 
 STACK_CLIPS_DIR = pathlib.Path('stack')
 
-STORE_CLIPS = pathlib.Path('youtube')
+AUTHORS_DIR = pathlib.Path('youtube')
 
 
 

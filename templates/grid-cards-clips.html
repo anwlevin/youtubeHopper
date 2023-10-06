@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+
+'author': author_data,
+
+{% block topbar %}
+    <div class="row justify-content-md-center">
+        <div class="col">
+            <a href="{{ author.href }}" class="text-decoration-none">
+                        <h3 class="mb-1 fw-normal text-dark">
+                            {{ author.title }}
+                        </h3>
+                        <p class="text-body-secondary fw-normal mb-0">
+                            {{ author.username }}
+                        </p>
+                    </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="card-columns">
+        {% for clip in clips %}
+            <div class="card m-1 mb-4 " >
+                <img class="card-img-top lazy" src="{{ clip.thumbnail }}" >
+                <div class="card-body">
+                    <h5 class="card-title">{{ clip.title }}</h5>
+                    <p class="card-text">
+                        <a href="{{ clip.url }}" class="stretched-link">{{ clip.url }}</a>
+                    </p>
+                    <p class="card-text">
+                        {{ clip.description }}
+                    </p>
+
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

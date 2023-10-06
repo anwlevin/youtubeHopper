@@ -2,7 +2,7 @@ import pathlib
 
 import yaml
 
-from config import STORE_CLIPS, STACK_CLIPS_DIR
+from config import AUTHORS_DIR, STACK_CLIPS_DIR
 from utils import write_file, walk_files
 
 from parseData import get_video_info
@@ -16,7 +16,7 @@ def author_clip_init(author_url) -> pathlib.Path | None | bool:
         print('🛑️ Err \t  len(url_parts) < 2:')
         return True
 
-    author_dir = STORE_CLIPS.joinpath(url_parts[-1])
+    author_dir = AUTHORS_DIR.joinpath(url_parts[-1])
     if not author_dir.exists():
         print('♻️ \t  not author_dir.exists():')
         author_dir.mkdir(parents=True, exist_ok=True)
@@ -47,7 +47,7 @@ def thumbnail_clip(thumbnail_url, author_dir, clip_slug) -> pathlib.Path | None:
 def process_one_clip(clip_id):
     print('⛺️ ', f'processOneClip: \t {clip_id}')
 
-    walk_clips = walk_files(STORE_CLIPS)
+    walk_clips = walk_files(AUTHORS_DIR)
     clip_find_tag = f'video-{clip_id}'
     if clip_exist := list(filter(lambda clip: clip_find_tag in clip.name, walk_clips)):
         print('🗽 Yet Exist', '\n')
@@ -97,8 +97,8 @@ def stack():
     print('🎿 stack(): \n')
     print()
 
-    if not STORE_CLIPS.exists():
-        STORE_CLIPS.mkdir(parents=True, exist_ok=True)
+    if not AUTHORS_DIR.exists():
+        AUTHORS_DIR.mkdir(parents=True, exist_ok=True)
 
     if not STACK_CLIPS_DIR.exists():
         print('if not CLIPS_DIR.exists():')
