@@ -83,14 +83,32 @@ def renderForwardPostContent(message: telegram.Message, data: dict):
          })
 
 
-def makeIndexOneAuthor(author_dir):
-    print('🧿 makeIndexOneAuthor(): ', author_dir.name)
+def getIndexPlaylists(author):
+    print('🦬 getIndexPlaylists()')
+    playlists = sorted(list(filter(lambda file: file.name.startswith('playlist-') and file.name.endswith('.yml'), author.iterdir())), reverse=True)
+    pls = []
+    all_videos = []
+    for playlist in playlists:
+        print(playlist)
+        data = read_yaml(playlist)
+        if not data.get('title'):
+            continue
+        videos = [author.joinpath(video) for video in data.get('videos')]
+        all_videos += videos
+        videos_context = get_context_videos(videos)
+        context = dict({
+                'url': data.get('url'),
+                'title': data.get('title'),
+                'videos': videos_context,
+        })
+        pls.append(context)
 
-    clips = sorted(list(filter(lambda file: file.name.startswith('video-') and file.name.endswith('.yml'), author_dir.iterdir())), reverse=True)
+    return pls, all_videos
 
-    clips_context = []
 
-    for clip in clips:
+def get_context_videos(videos):
+    all_videos_context = []
+    for clip in videos:
         print('📮 Clip: ', clip.name)
 
         text_clip = read_file(clip)
@@ -98,18 +116,18 @@ def makeIndexOneAuthor(author_dir):
 
         data_clip = yaml_clip
 
-        clip_context = dict()
+        context = dict()
 
         if not data_clip.get('title'):
             continue
 
-        clip_context['title'] = data_clip['title']
-        clip_context['date'] = data_clip['publish_date']
-        clip_context['url'] = data_clip['url']
+        context['title'] = data_clip['title']
+        context['date'] = data_clip['publish_date']
+        context['url'] = data_clip['url']
 
         clip_url = data_clip['url']
         clip_description = data_clip['description']
-        clip_context['description'] = f'''
+        context['description'] = f'''
         <p>
             {data_clip['publish_date']}
             </p>
@@ -118,21 +136,43 @@ def makeIndexOneAuthor(author_dir):
             </p>
         '''
 
-        clip_context['thumbnail'] = data_clip['thumbnail']
+        context['thumbnail'] = data_clip['thumbnail']
 
-        clips_context.append(clip_context)
+        all_videos_context.append(context)
+
+    return all_videos_context
+
+
+def makeIndexOneAuthor(author):
+    print('🧿 makeIndexOneAuthor(): ', author.name)
+
+
+    playlists, playlists_all_videos = getIndexPlaylists(author)
+    #print('playlists: ')
+    #print(playlists)
+
+    playlists_all_videos = list(set(playlists_all_videos))
+
+    videos = sorted(
+        list(filter(lambda file: file.name.startswith('video-') and file.name.endswith('.yml'), author.iterdir())),
+        reverse=True)
+
+    videos = list(filter(lambda video: video not in playlists_all_videos,videos))
+
+    clips_context = get_context_videos(videos)
 
     clips_context.sort(key=lambda clip_one: clip_one['date'], reverse=True)
 
-    author_text = read_file(author_dir.joinpath('about.yml'))
+    author_text = read_file(author.joinpath('about.yml'))
     author_data = yaml.load(author_text, Loader=yaml.Loader)
-    author_data['username'] = author_dir.name
+    author_data['username'] = author.name
 
     template = Environment(loader=FileSystemLoader("templates")).get_template("grid-cards-clips.html")
-    write_file(author_dir.joinpath('index.html'), template.render({
-        'title': f'{author_dir.name} | Index',
+    write_file(author.joinpath('index.html'), template.render({
+        'title': f'{author.name} | Index',
         'author': author_data,
         'clips': clips_context,
+        'playlists': playlists
     }))
 
 

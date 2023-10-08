@@ -1,7 +1,24 @@
 {% extends "base.html" %}
 
+{% macro videos_block(videos) -%}
+  <div class="row row-cols-4">
+        {% for video in videos %}
+        <div class="col">
+            <div class="card m-1 mb-4 ">
+                <img class="card-img-top lazy" src="{{ video.thumbnail }}" >
+                <div class="card-body">
+                    <strong class="card-title">{{ video.title }}</strong>
+                    <p class="card-text">
+                        <a href="{{ video.url }}" class="stretched-link">{{ video.url }}</a>
+                    </p>
+                </div>
+            </div>
+            </div>
+        {% endfor %}
+    </div>
+{%- endmacro %}
 
-'author': author_data,
+
 
 {% block topbar %}
     <div class="row justify-content-md-center">
@@ -19,6 +36,22 @@
 {% endblock %}
 
 {% block content %}
+    <h2 class="mb-3">🔮 Playlists</h2>
+    {% for playlist in playlists %}
+        <div class="mb-4">
+            <a href="{{ playlist.url }}" class="fw-normal text-dark"><h3>{{ playlist.title }}</h3></a>
+            {{ videos_block(playlist.videos) }}
+        </div>
+    {% endfor %}
+
+
+    <h2 class="mt-5">🍱 Movies</h2>
+
+    {{ videos_block(clips) }}
+
+
+
+    {% if oldcard %}
     <div class="card-columns">
         {% for clip in clips %}
             <div class="card m-1 mb-4 " >
@@ -36,4 +69,6 @@
             </div>
         {% endfor %}
     </div>
+    {% endif %}
+
 {% endblock %}
