@@ -145,6 +145,7 @@ def belo_kofe():
     for vid in vids:
         write_file(STACK_CLIPS_DIR.joinpath(f'{vid}.txt'), '')
 
+
 if __name__ == '__main__':
     #channleProcessing()
     belo_kofe()

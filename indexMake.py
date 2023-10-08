@@ -8,7 +8,7 @@ from jinja2 import Environment, FileSystemLoader
 from urlextract import URLExtract
 
 import config
-from utils import read_file, write_file
+from utils import read_file, write_file, read_yaml
 
 
 def text_Preprocessing(text_html):
@@ -24,9 +24,6 @@ def text_Preprocessing(text_html):
     text_html = text_html.replace('\n', '<br>\n')
 
     return text_html
-
-
-
 
 
 def renderForwardPostContent(message: telegram.Message, data: dict):
@@ -103,6 +100,9 @@ def makeIndexOneAuthor(author_dir):
 
         clip_context = dict()
 
+        if not data_clip.get('title'):
+            continue
+
         clip_context['title'] = data_clip['title']
         clip_context['date'] = data_clip['publish_date']
         clip_context['url'] = data_clip['url']
@@ -136,9 +136,8 @@ def makeIndexOneAuthor(author_dir):
     }))
 
 
-
-def makeIndexAllChats():
-    print('💎️ makeIndexAllChats(): ')
+def makeAllIndexAuthors():
+    print('💎️ makeAllIndexAuthors()')
 
     if not config.AUTHORS_DIR.exists():
         print('🚫 not config.AUTHORS_DIR.exists:')
@@ -153,8 +152,7 @@ def makeIndexAllChats():
     authors_context = []
 
     for author_dir in author_dirs:
-        author_text = read_file(author_dir.joinpath('about.yml'))
-        author_data = yaml.load(author_text, Loader=yaml.Loader)
+        author_data = read_yaml(author_dir.joinpath('about.yml'))
         author_data['username'] = author_dir.name
         author_data['thumbnail'] = author_dir.name + '/' + author_data['thumbnail']
         author_data['href'] = author_dir.name
@@ -164,11 +162,11 @@ def makeIndexAllChats():
 
     template = Environment(loader=FileSystemLoader("templates")).get_template("index-authors-all.html")
     write_file(config.AUTHORS_DIR.joinpath('index.html'), template.render({
-        'title': f'Index of the Store',
+        'title': f'Index of the Authors',
         'authors': authors_context}))
 
 
 
 if __name__ == '__main__':
 
-    makeIndexAllChats()
+    makeAllIndexAuthors()

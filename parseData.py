@@ -156,3 +156,27 @@ def get_channel_info(url):
     #result['channel'] = {'name': channel_name, 'url': channel_url, 'subscribers': channel_subscribers}
 
     return result
+
+
+def get_playlists_channel(url):
+    response = session.get(url)
+    response.html.render(timeout=5)
+
+    soup = bs(response.html.html, "html.parser")
+
+    playlists = []
+    items_soup = soup.find("div", {"id": "items"})
+    if not items_soup:
+        return
+
+    playlists_soup = items_soup.find_all('ytd-grid-playlist-renderer')
+
+    for playlist_soup in playlists_soup:
+        a = playlist_soup.find('a', {"id": "video-title"})
+        print(a['title'])
+        print(a['href'])
+
+
+
+
+    return playlists

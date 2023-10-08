@@ -2,6 +2,7 @@ import os
 import pathlib
 
 import requests
+import yaml
 
 
 def read_file(path: str | pathlib.Path):
@@ -66,3 +67,19 @@ def walk_files(path: str | pathlib.Path) -> list[pathlib.Path]:
 def wget(url):
     r = requests.get(url, allow_redirects=True)
     return r.content.decode('utf-8')
+
+
+def read_yaml(path: str | pathlib.Path):
+    text = read_file(path)
+    return yaml.load(text, Loader=yaml.Loader)
+
+
+def write_yaml(path: str | pathlib.Path, data) -> pathlib.Path | None:
+    text = yaml.dump(
+        data,
+        default_flow_style=False,
+        sort_keys=False,
+        allow_unicode=True,
+    )
+
+    return write_file(path, text)

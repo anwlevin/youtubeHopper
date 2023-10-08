@@ -8,17 +8,17 @@
     <div class="row justify-content-center">
         <div class="col-8 mb-4">
             {% for author in authors %}
-                <div class="row mb-4 align-items-center">
-                    <div class="col-4 col-sm-3 col-md-2 ">
+                <div class="row mb-3 align-items-center">
+                    <div class="col-4 col-sm-3 col-md-2 px-3 ">
                         <a href="{{ author.href }}" class="text-decoration-none">
                             <img src="{{ author.thumbnail}}" class="img-thumbnail rounded-circle">
                         </a>
                     </div>
                     <div class="col">
                         <a href="{{ author.href }}" class="text-decoration-none">
-                            <h3 class="mb-1 fw-normal text-dark">
+                            <h4 class="mb-1 fw-normal text-dark">
                                 {{ author.title }}
-                            </h3>
+                            </h4>
                         </a>
                     </div>
                 </div>
