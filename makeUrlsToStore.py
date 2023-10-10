@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from config import STACK_CLIPS_DIR, DISCOVER_DIR, DISCOVER_URLS_CLIPS_TXT
+from config import STACK_CLIPS_DIR, ALL_DISCOVER_CHATS_DIR, DISCOVER_URLS_CLIPS_TXT
 from utils import write_file, read_file, walk_files
 
 from pytube import YouTube
@@ -40,11 +40,11 @@ def make_urls2stack():
     print('🏓 make_urls2stack(): ')
     print()
 
-    if not DISCOVER_DIR.exists():
+    if not ALL_DISCOVER_CHATS_DIR.exists():
         print('🛑 Err \t  not URLS_CLIPS_TXT.exists():')
         return
 
-    all_files = walk_files(DISCOVER_DIR)
+    all_files = walk_files(ALL_DISCOVER_CHATS_DIR)
     urls_files = list(filter(lambda file: file.name == DISCOVER_URLS_CLIPS_TXT.name, all_files))
 
     clip_ids = []
