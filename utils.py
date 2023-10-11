@@ -1,8 +1,8 @@
 import os
 import pathlib
-
 import requests
 import yaml
+from urlextract import URLExtract
 
 
 def read_file(path: str | pathlib.Path):
@@ -17,19 +17,8 @@ def read_file(path: str | pathlib.Path):
 
     return data
 
-def write_file(path: str | pathlib.Path, data) -> pathlib.Path | None:
-    path = pathlib.Path(path)
-    try:
-        with open(path.resolve().as_posix(), "w+") as f:
-            f.write(data)
-    except (Exception,):
-        print('Err.', 'write_file: try: with open(cover.as_posix()')
-        return
 
-    return path
-
-
-def write_file(path, data, mode='w+'):
+def write_file(path: str | pathlib.Path, data, mode='w+') -> pathlib.Path | None:
     path = pathlib.Path(path)
     try:
         with open(path.resolve().as_posix(), mode) as f:
@@ -41,7 +30,7 @@ def write_file(path, data, mode='w+'):
     return path
 
 
-def getFirstYoutubeUrl(text):
+def get_first_youtube_url(text):
     extractor = URLExtract()
     urls = extractor.find_urls(text)
     for url in urls:
@@ -64,6 +53,7 @@ def walk_files(path: str | pathlib.Path) -> list[pathlib.Path]:
     all_files = [pathlib.Path(file) for file in data]
     return all_files
 
+
 def wget(url):
     r = requests.get(url, allow_redirects=True)
     return r.content.decode('utf-8')
@@ -81,5 +71,19 @@ def write_yaml(path: str | pathlib.Path, data) -> pathlib.Path | None:
         sort_keys=False,
         allow_unicode=True,
     )
-
     return write_file(path, text)
+
+def last_yt(url):
+    try:
+        yt = YouTube(url)
+    except Exception as e:
+        yt = None
+
+    if not yt:
+        return
+
+    print(yt.video_id)
+    print(yt.author)
+    print(yt.vid_info)
+
+    return
